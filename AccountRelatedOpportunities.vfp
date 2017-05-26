@@ -1,0 +1,54 @@
+<!-- Page will display brief account details and also display all of it's related opportunities.
+	 It also showcase an New button to add 'new' record and save that opportunity. 
+	 Delete option is also provided to delete an opportunity.
+--> 
+<apex:page standardController="Account" extensions="AssociatedOpportunities">
+    <!-- Form containing pageBlock for Account Details and their related opportunities  -->
+    <apex:form id="frmAccountDetail">
+        <!-- Header section to display Account as title and Account Name as subtitle  -->
+       <apex:sectionHeader title="Account" subtitle="{!Account.Name}"/>
+        <!-- pageBlock to display some brief info related to the account  -->
+       <apex:pageBlock id="AccountSummary" title="Account Summary">
+       		 
+           <apex:pageBlockTable value="{! Account }" var="act">
+            <apex:column value="{! act.AccountNumber }"/>
+            <apex:column value="{! act.Website }"/>
+            <apex:column value="{! act.Phone }"/>
+            
+        </apex:pageBlockTable>
+        </apex:pageBlock>
+        <!-- End of pageBlock  -->
+        <!-- pageBlock to display all the realted opportunities with an option to add new opportunity and delete the current opportunity -->
+        <apex:pageblock id="RelatedOppList" title="Related Opportunities">
+                <apex:variable var="index" value="{!0}"/>
+                <apex:pageBlockTable value="{!allOpp}" var="opp" rendered="{!NOT(ISNULL(allOpp))}">
+                <apex:column headerValue="Action">
+                <apex:commandLink reRender="frmAccountDetail" value="Delete" action="{!deleteOpportunity}" rendered="{!opp.btnIsVisible}">
+                    <apex:param name="indexInsert" value="{!index}"/>
+                </apex:commandLink>
+                <apex:commandLink reRender="frmAccountDetail" value="Save" action="{!insertNewOpportunity}" rendered="{!!opp.btnIsVisible}">
+                    <apex:param name="indexInsert" value="{!index}"/>
+                </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="Name">
+                    <apex:outputField value="{!opp.oppDetail.name}" rendered="{!opp.btnIsVisible}"/>
+                    <apex:inputField value="{!opp.oppDetail.name}" rendered="{!!opp.btnIsVisible}"/>
+                </apex:column>
+                <apex:column headerValue="Stage Name">
+                    <apex:outputField value="{!opp.oppDetail.StageName}" rendered="{!opp.btnIsVisible}"/>
+                    <apex:inputField value="{!opp.oppDetail.StageName}" rendered="{!!opp.btnIsVisible}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:outputField value="{!opp.oppDetail.CloseDate}" rendered="{!opp.btnIsVisible}"/>
+                    <apex:inputField value="{!opp.oppDetail.CloseDate}" rendered="{!!opp.btnIsVisible}"/>
+                    <apex:variable var="index" value="{!index+1}"/>
+                </apex:column>
+                </apex:pageBlockTable>
+            <!-- pageBlockButton section to mention to keep the button block on top of the pageBlock  -->
+            <apex:pageBlockButtons location="Top">
+            <apex:commandButton action="{!addNewOpportunity}" value="New" reRender="frmAccountDetail"/>       
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+        <!-- End of pageBlock  -->
+    </apex:form>
+</apex:page>

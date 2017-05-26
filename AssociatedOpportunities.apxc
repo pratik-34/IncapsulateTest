@@ -1,0 +1,86 @@
+public class AssociatedOpportunities {
+	
+    public List<bindOpportunity> allOpp {get;set;}    
+    public Account acct {get; set;} 
+    public Opportunity  newOpp {get; set;}
+    
+    /** Constructor to get the Account Id  */
+    public AssociatedOpportunities(ApexPages.StandardController controller) 
+    {
+        this.acct= (Account)controller.getRecord();
+        fetchAllOpportunity();
+    }
+    
+    /** Method to return the Account Details */
+    public Account getAccountDetails()
+    {
+        Account acct = [SELECT id,Name,AccountNumber,Website,Phone FROM Account where id = :acct.id];
+        return acct;
+    }
+    
+    /** Method to fetch all the Opportunities from the current Account and add it to the binding List */
+    public void fetchAllOpportunity()
+    {
+        allOpp = new List<bindOpportunity>();   
+        List<Opportunity> oppRelatedToAccount = [SELECT id, Name, Account.Name,StageName, CloseDate 
+                                                    FROM Opportunity WHERE 
+                                                    AccountId = :acct.Id];
+        
+        for(Opportunity oppo: oppRelatedToAccount) 
+        {
+            bindOpportunity bindOpp = new bindOpportunity();
+            bindOpp.oppDetail= oppo;
+            bindOpp.btnIsVisible = true; // when true will have Delete button
+            allOpp.add(bindOpp);
+        }
+    }
+    
+    /** Method to delete a Opportunity */
+    public void deleteOpportunity() 
+    {
+        String indexNum = ApexPages.currentPage().getParameters().get('indexInsert');
+        if(!String.isBlank(indexNum))
+        {
+            Integer indexval = Integer.valueOf(indexNum);
+            delete allOpp[indexval].oppDetail;
+            fetchAllOpportunity();
+        }
+        
+    }
+    
+    /** Method to add a new Row before it is saved. */
+    public void addNewOpportunity() 
+    {        
+        newOpp = new Opportunity();
+        newOpp.AccountId = acct.Id;
+        bindOpportunity oppNew = new bindOpportunity();
+        oppNew.oppDetail = newOpp;
+        oppNew.btnIsVisible =false; // when false, we will display Save button 
+        allOpp.add(oppNew);  
+    }
+    
+    /** Method to insert the new Opportunity */
+    public void insertNewOpportunity() 
+    {
+        String indexNum = ApexPages.currentPage().getParameters().get('indexInsert');
+        if(!String.isBlank(indexNum)) 
+        {
+            Integer indexval = Integer.valueOf(indexNum);
+            insert allOpp[indexval].oppDetail;
+            fetchAllOpportunity();
+        }
+        
+    }
+    
+    /** Binding class */
+    public class bindOpportunity 
+    {
+        public Opportunity oppDetail{get;set;}
+        public boolean btnIsVisible {get;set;}
+        public bindOpportunity() 
+        {
+            oppDetail = new Opportunity();
+            btnIsVisible = false; // we set the default value to false
+        }
+    }
+}

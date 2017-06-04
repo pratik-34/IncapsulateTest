@@ -1,0 +1,21 @@
+@isTest
+public class
+TestAssociatedOpportunities {
+    public static testMethod void runTestCase(){
+        test.startTest();
+        //Creating a new account and inserting the same into the database
+        Account testacct = new Account(name='Test Case Incapsulate');
+        Database.insert(testacct);
+        //Creating an object of the Associated Opportunity
+        AssociatedOpportunities accopp = new AssociatedOpportunities();
+        accopp.acct = testacct;
+        
+        Account testacdetail = accopp.getAccountDetails();
+        Opportunity testopp = new Opportunity(Name='Incapsulate Opportunity 1',StageName='Prospecting', CloseDate=date.newInstance(2017, 01, 15), AccountId = testacct.Id);
+        accopp.fetchAllOpportunity();
+        accopp.addNewOpportunity();
+        accopp.deleteOpportunity();
+        accopp.insertNewOpportunity();
+        test.stopTest();
+    }	
+}
